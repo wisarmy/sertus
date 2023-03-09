@@ -31,8 +31,8 @@ impl Executor for ProcessChecker {
     type Output = bool;
     async fn exec(&self) -> crate::error::Result<Self::Output> {
         let output = Command::new("ps")
-            .arg("-e")
-            .arg("-o command")
+            .arg("-eo")
+            .arg("command")
             .output()
             .await
             .unwrap();
