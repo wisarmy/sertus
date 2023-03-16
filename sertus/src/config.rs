@@ -20,7 +20,14 @@ pub(crate) static CONFIG: OnceCell<RwLock<Option<Config>>> = OnceCell::new();
 
 #[derive(Serialize, Deserialize, Debug, Clone, Toml)]
 pub struct Config {
+    pub metrics: Metrics,
     pub flows: Vec<Flow>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Metrics {
+    pub addr: String,
+    pub bucket: String,
 }
 
 impl Configurable for Config {
@@ -65,7 +72,13 @@ where
 
 impl Default for Config {
     fn default() -> Self {
-        Self { flows: vec![] }
+        Self {
+            flows: vec![],
+            metrics: Metrics {
+                addr: "127.0.0.1:9296".to_string(),
+                bucket: "sertus".to_string(),
+            },
+        }
     }
 }
 
