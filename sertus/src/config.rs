@@ -1,9 +1,9 @@
 use std::future::Future;
 use std::{fs, path::PathBuf, sync::RwLock};
 
-use config::{Configurable, FileType, Toml};
 use home::home_dir;
 use once_cell::sync::{Lazy, OnceCell};
+use sconfig::{Configurable, FileType, Toml};
 use serde::{Deserialize, Serialize};
 use tracing::{error, info};
 

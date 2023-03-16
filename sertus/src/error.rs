@@ -23,7 +23,7 @@ pub enum AppError {
     #[error("reqwest error")]
     Reqwest(#[from] reqwest::Error),
     #[error("config error")]
-    Config(#[from] config::error::ConfigError),
+    Config(#[from] sconfig::error::ConfigError),
 }
 
 #[macro_export]

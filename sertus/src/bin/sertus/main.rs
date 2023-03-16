@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use config::Configurable;
+use sconfig::Configurable;
 use sertus::{
     checker::process::ProcessChecker,
     checker::Checker,
@@ -24,8 +24,8 @@ struct Cli {
 #[derive(Subcommand, Debug)]
 enum Command {
     Init {
-        #[arg(short, long)]
-        force: Option<bool>,
+        #[clap(short, long)]
+        force: bool,
     },
     Daemon,
 }
@@ -65,7 +65,7 @@ async fn main() -> Result<()> {
                 ));
             config.add_flow(flow1).add_flow(flow2);
 
-            config.init(force.unwrap_or_default())?;
+            config.init(force)?;
         }
         Command::Daemon => {
             info!("Initializing daemon");
