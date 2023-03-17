@@ -38,20 +38,20 @@ impl Flow {
                     Ok(output) => {
                         if output {
                             info!("Succeeded Task({})", task.name);
-                            metrics::gauge!("sertus_flow_task_succeed", 1f64, &labels);
+                            metrics::increment_counter!("sertus_flow_task_succeed_count", &labels);
                         } else {
                             warn!("Failed Task({})", task.name);
-                            metrics::gauge!("sertus_flow_task_fail", 1f64, &labels);
+                            metrics::increment_counter!("sertus_flow_task_fail_count", &labels);
                         }
                     }
                     Err(e) => {
-                        metrics::gauge!("sertus_flow_task_error", 1f64, &labels);
+                        metrics::increment_counter!("sertus_flow_task_error_count", &labels);
                         error!("Error Task({}), {}", task.name, e);
                     }
                 }
             }
             debug!("Ended Flow({} {})", self.name, "-".repeat(30));
-            metrics::increment_counter!("sertus_flow_loop_times", &flow_lables);
+            metrics::increment_counter!("sertus_flow_loop_count", &flow_lables);
             sleep(Duration::from_secs(self.interval)).await
         }
     }
