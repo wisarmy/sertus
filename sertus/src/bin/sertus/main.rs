@@ -5,12 +5,11 @@ use sertus::{
     checker::Checker,
     config::{with_config, Config},
     error::Result,
-    executor::Executor,
     flow::Flow,
     metrics::start_metrics_server,
     task::Task,
 };
-use tracing::{debug, error, info, warn};
+use tracing::{debug, info};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 /// Sertus program
@@ -71,38 +70,10 @@ async fn main() -> Result<()> {
             info!("Initializing daemon");
             with_config(|c| async move {
                 debug!("With config: {:#?}", c);
-
-                let mut labels: Vec<(&str, String)> = vec![];
                 tokio::spawn(start_metrics_server(c.metrics.addr, c.metrics.bucket));
 
-                for flow in c.flows {
-                    labels.push(("flow", flow.name.clone()));
-                    // TODO flow timer
-                    debug!("Starting Flow({} {})", flow.name, "-".repeat(30));
-                    for task in flow.tasks {
-                        labels.push(("task", task.name.clone()));
-                        debug!("Running Task({}), {:?}", task.name, task.checker);
-                        match task.checker.exec().await {
-                            Ok(output) => {
-                                if output {
-                                    info!("Succeeded Task({})", task.name);
-                                    metrics::increment_counter!(
-                                        "sertus_flow_task_succeed",
-                                        &labels
-                                    );
-                                } else {
-                                    warn!("Failed Task({})", task.name);
-                                    metrics::increment_counter!("sertus_flow_task_fail", &labels);
-                                }
-                            }
-                            Err(e) => {
-                                metrics::increment_counter!("sertus_flow_task_error", &labels);
-                                error!("Error Task({}), {}", task.name, e);
-                            }
-                        }
-                    }
-                    metrics::increment_counter!("sertus_flow_ok", &labels);
-                    debug!("Ended Flow({} {})", flow.name, "-".repeat(30));
+                for flow in c.flows.into_iter() {
+                    tokio::spawn(flow.run());
                 }
             })
             .await;

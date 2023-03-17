@@ -3,8 +3,8 @@ Sertus is a service status monitoring tool that supports multiple checkers, incl
 
 # Features
 - [x] Supports Prometheus metrics
-- [ ] Enables flows with concurrency
-- [ ] Allows for setting intervals for flows
+- [x] Enables flows with concurrency
+- [x] Allows for setting intervals for flows
 - [ ] Divides flows configuration into multiple flow config files
 - [ ] Supports script checkers
 - [ ] Supports API checkers
