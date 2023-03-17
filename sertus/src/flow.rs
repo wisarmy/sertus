@@ -45,7 +45,7 @@ impl Flow {
                         }
                     }
                     Err(e) => {
-                        metrics::increment_counter!("sertus_flow_task_error", &labels);
+                        metrics::gauge!("sertus_flow_task_error", 1f64, &labels);
                         error!("Error Task({}), {}", task.name, e);
                     }
                 }
