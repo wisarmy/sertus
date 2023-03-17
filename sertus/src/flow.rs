@@ -27,10 +27,9 @@ impl Flow {
     }
 
     pub async fn run(self) {
+        let flow_lables: Vec<(&str, String)> = vec![("flow", self.name.clone())];
         loop {
-            let mut labels: Vec<(&str, String)> = vec![];
-            labels.push(("flow", self.name.clone()));
-            // TODO flow timer
+            let mut labels: Vec<(&str, String)> = flow_lables.clone();
             debug!("Starting Flow({} {})", self.name, "-".repeat(30));
             for task in self.tasks.clone() {
                 labels.push(("task", task.name.clone()));
@@ -39,10 +38,10 @@ impl Flow {
                     Ok(output) => {
                         if output {
                             info!("Succeeded Task({})", task.name);
-                            metrics::gauge!("sertus_flow_task_succeed", 1.0, &labels);
+                            metrics::gauge!("sertus_flow_task_succeed", 1f64, &labels);
                         } else {
                             warn!("Failed Task({})", task.name);
-                            metrics::increment_counter!("sertus_flow_task_fail", &labels);
+                            metrics::gauge!("sertus_flow_task_fail", 1f64, &labels);
                         }
                     }
                     Err(e) => {
@@ -51,8 +50,8 @@ impl Flow {
                     }
                 }
             }
-            metrics::increment_counter!("sertus_flow_ok", &labels);
             debug!("Ended Flow({} {})", self.name, "-".repeat(30));
+            metrics::increment_counter!("sertus_flow_loop_times", &flow_lables);
             sleep(Duration::from_secs(self.interval)).await
         }
     }
