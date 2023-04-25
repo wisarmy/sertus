@@ -17,6 +17,7 @@ To get started with Sertus, follow these simple steps:
 sertus init
 ```
 The default configuration file `~/.sertus/config.toml` will be generated.
+
 2. Edit the configuration file to specify the task checkers for flows.
 
 
