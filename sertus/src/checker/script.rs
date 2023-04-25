@@ -52,14 +52,13 @@ mod tests {
     async fn test_script_checker() -> Result<(), Box<dyn std::error::Error>> {
         init_tracing_log();
         let mut script_file = NamedTempFile::new()?;
-        // 将脚本写入临时文件
+        // write a script into a temporary
         let script_content = "#!/bin/bash\necho \"Hello, world!\"\n";
         script_file.write_all(script_content.as_bytes())?;
 
         let checker = ScriptChecker::new(script_file.path().to_str().ok_or("path to str failed")?);
         assert!(checker.exec().await?);
-
-        // 删除临时文件
+        // remove temp file
         script_file.close()?;
         Ok(())
     }
