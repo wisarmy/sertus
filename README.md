@@ -3,6 +3,8 @@ Sertus is a service status monitoring tool that supports multiple checkers, incl
 
 # Features
 - [x] Supports Prometheus metrics
+    - [x] Supports Prometheus metrics server
+    - [x] Supports Prometheus push gateway
 - [x] Enables flows with concurrency
 - [x] Allows for setting intervals for flows
 - [ ] Divides flows configuration into multiple flow config files
@@ -28,9 +30,16 @@ sertus daemon
 
 # Configuration Example
 ```toml
-[metrics]
+# use metrics server
+[metrics.Server]
 addr = "127.0.0.1:9296"
 bucket = "sertus"
+
+# or use prometheus push gateway
+#[metrics.PushGateway]
+#endpoint = "http://127.0.0.1:9091/metrics/job/sertus/instance/127.0.0.1"
+#interval = 10
+
 
 [[flows]]
 name = "flow 1"

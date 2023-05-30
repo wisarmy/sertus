@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{error, info};
 
 use crate::flow::Flow;
+use crate::metrics::Metrics;
 
 const CONFIG_PATH: Lazy<PathBuf> = Lazy::new(|| {
     let mut sertus_path = home_dir().unwrap().join(".sertus");
@@ -22,12 +23,6 @@ pub(crate) static CONFIG: OnceCell<RwLock<Option<Config>>> = OnceCell::new();
 pub struct Config {
     pub metrics: Metrics,
     pub flows: Vec<Flow>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Metrics {
-    pub addr: String,
-    pub bucket: String,
 }
 
 impl Configurable for Config {
@@ -74,10 +69,7 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             flows: vec![],
-            metrics: Metrics {
-                addr: "127.0.0.1:9296".to_string(),
-                bucket: "sertus".to_string(),
-            },
+            metrics: Metrics::default(),
         }
     }
 }

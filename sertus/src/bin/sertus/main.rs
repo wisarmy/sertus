@@ -6,7 +6,7 @@ use sertus::{
     config::{with_config, Config},
     error::Result,
     flow::Flow,
-    metrics::start_metrics_server,
+    metrics::{setup_pushgateway, start_metrics_server, Metrics},
     task::Task,
 };
 use tracing::{debug, info};
@@ -60,7 +60,14 @@ async fn main() -> Result<()> {
             info!("Initializing daemon");
             with_config(|c| async move {
                 debug!("With config: {:#?}", c);
-                tokio::spawn(start_metrics_server(c.metrics.addr, c.metrics.bucket));
+                match c.metrics {
+                    Metrics::Server(s) => {
+                        tokio::spawn(start_metrics_server(s));
+                    }
+                    Metrics::PushGateway(p) => {
+                        tokio::spawn(setup_pushgateway(p));
+                    }
+                }
 
                 for flow in c.flows.into_iter() {
                     tokio::spawn(flow.run());
