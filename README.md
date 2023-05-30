@@ -37,18 +37,12 @@ name = "flow 1"
 interval = 3
 
 [[flows.tasks]]
-name = "task 1"
-
-[flows.tasks.checker]
-type = "ProcessChecker"
-prefix = "process prefix"
+name = "check process"
+checker.ProcessChecker = { prefix = "process prefix" }
 
 [[flows.tasks]]
-name = "task 2"
-
-[flows.tasks.checker]
-type = "ScriptChecker"
-path = "/root/.sertus/echo.sh"
+name = "check script"
+checker.ScriptChecker = { path = "~/.sertus/scripts/script.sh" }
 ```
 
 
