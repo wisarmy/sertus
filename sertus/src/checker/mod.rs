@@ -10,7 +10,6 @@ pub mod process;
 pub mod script;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(tag = "type")]
 pub enum Checker {
     ProcessChecker(ProcessChecker),
     ScriptChecker(ScriptChecker),

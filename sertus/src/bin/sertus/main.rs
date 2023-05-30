@@ -1,8 +1,8 @@
 use clap::{Parser, Subcommand};
 use sconfig::Configurable;
 use sertus::{
-    checker::process::ProcessChecker,
     checker::Checker,
+    checker::{process::ProcessChecker, script::ScriptChecker},
     config::{with_config, Config},
     error::Result,
     flow::Flow,
@@ -43,26 +43,16 @@ async fn main() -> Result<()> {
             // init
             let mut config = Config::default();
             let mut flow1 = Flow::new("flow 1");
-            let mut flow2 = Flow::new("flow 2");
             flow1
                 .add_task(Task::new(
-                    "task 1",
+                    "check process",
                     Checker::ProcessChecker(ProcessChecker::new("process prefix")),
                 ))
                 .add_task(Task::new(
-                    "task 2",
-                    Checker::ProcessChecker(ProcessChecker::new("process prefix")),
+                    "check script",
+                    Checker::ScriptChecker(ScriptChecker::new("~/.sertus/scripts/script.sh")),
                 ));
-            flow2
-                .add_task(Task::new(
-                    "task 1",
-                    Checker::ProcessChecker(ProcessChecker::new("process prefix")),
-                ))
-                .add_task(Task::new(
-                    "task 2",
-                    Checker::ProcessChecker(ProcessChecker::new("process prefix")),
-                ));
-            config.add_flow(flow1).add_flow(flow2);
+            config.add_flow(flow1);
 
             config.init(force)?;
         }
