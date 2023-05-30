@@ -3,7 +3,7 @@ use std::fmt::Display;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use tokio::process::Command;
-use tracing::trace;
+use tracing::debug;
 
 use crate::executor::Executor;
 
@@ -43,7 +43,7 @@ impl Executor for ProcessChecker {
             .filter(|s| *s != "COMMAND")
             .filter(|s| s.starts_with(&self.prefix))
             .collect::<Vec<_>>();
-        trace!("process checker: {}, {:?}", self.prefix, processes);
+        debug!("process checker: {}, {:?}", self.prefix, processes);
         Ok(processes.len() > 0)
     }
 }
