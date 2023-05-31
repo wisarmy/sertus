@@ -7,6 +7,7 @@ use sertus::{
     error::Result,
     flow::Flow,
     metrics::{setup_pushgateway, start_metrics_server, Metrics},
+    pkg::version,
     task::Task,
 };
 use tracing::{debug, info};
@@ -14,7 +15,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 /// Sertus program
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(author, version=version::default(), about, long_about = None)]
 struct Cli {
     #[command(subcommand)]
     commnad: Command,

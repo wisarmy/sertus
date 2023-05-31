@@ -7,6 +7,7 @@ pub mod error;
 pub mod executor;
 pub mod flow;
 pub mod metrics;
+pub mod pkg;
 pub mod task;
 
 #[allow(dead_code)]
