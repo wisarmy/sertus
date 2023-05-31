@@ -3,7 +3,7 @@ use std::fmt::Display;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use tokio::process::Command;
-use tracing::debug;
+use tracing::{debug, warn};
 
 use crate::executor::Executor;
 
@@ -36,7 +36,7 @@ impl Executor for ScriptChecker {
         let content = String::from_utf8_lossy(&output.stdout);
         debug!("script checker stdout: {}, {}", self.path, content);
         if output.stderr.len() > 0 {
-            debug!(
+            warn!(
                 "script checker stderr: {}, {}",
                 self.path,
                 String::from_utf8_lossy(&output.stderr)

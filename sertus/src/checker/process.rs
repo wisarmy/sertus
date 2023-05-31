@@ -3,7 +3,7 @@ use std::fmt::Display;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use tokio::process::Command;
-use tracing::debug;
+use tracing::{debug, warn};
 
 use crate::executor::Executor;
 
@@ -44,6 +44,13 @@ impl Executor for ProcessChecker {
             .filter(|s| s.starts_with(&self.prefix))
             .collect::<Vec<_>>();
         debug!("process checker: {}, {:?}", self.prefix, processes);
+        if output.stderr.len() > 0 {
+            warn!(
+                "process checker stderr: {}, {}",
+                self.prefix,
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
         Ok(processes.len() > 0)
     }
 }
