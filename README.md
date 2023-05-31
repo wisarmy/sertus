@@ -38,8 +38,8 @@ bucket = "sertus"
 # or use prometheus push gateway
 #[metrics.PushGateway]
 #endpoint = "http://127.0.0.1:9091/metrics/job/sertus/instance/127.0.0.1"
-#interval = 10
-
+#interval = Option<u64> default 10(s)
+#idle_timeout = Option<u64> default 60(s)
 
 [[flows]]
 name = "flow 1"

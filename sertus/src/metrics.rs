@@ -33,8 +33,8 @@ pub struct Server {
 pub struct PushGateway {
     /// http://127.0.0.1:9091/metrics/job/example/instance/127.0.0.1
     pub endpoint: String,
-    /// Interval of metrics push
-    pub interval: u64,
+    /// Interval of metrics push, default 10s
+    pub interval: Option<u64>,
     /// Duration of metrics record retention, default 60s
     pub idle_timeout: Option<u64>,
 }
@@ -71,7 +71,10 @@ fn setup_metrics_recorder(metrics_bucket: impl Into<String>) -> PrometheusHandle
 pub async fn setup_pushgateway(config: PushGateway) {
     info!("Pushing metrics to {}", config.endpoint);
     PrometheusBuilder::new()
-        .with_push_gateway(config.endpoint, Duration::from_secs(config.interval))
+        .with_push_gateway(
+            config.endpoint,
+            Duration::from_secs(config.interval.unwrap_or(10)),
+        )
         .expect("push gateway endpoint should be valid")
         .idle_timeout(
             MetricKindMask::ALL,
