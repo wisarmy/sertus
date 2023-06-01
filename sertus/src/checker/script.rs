@@ -62,7 +62,7 @@ mod tests {
         script_file.write_all(script_content.as_bytes())?;
 
         let checker = ScriptChecker::new(script_file.path().to_str().ok_or("path to str failed")?);
-        assert!(checker.exec().await?);
+        assert!(checker.exec().await?.0);
         // remove temp file
         script_file.close()?;
         Ok(())

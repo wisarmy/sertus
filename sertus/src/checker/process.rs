@@ -75,6 +75,6 @@ mod tests {
     #[tokio::test]
     async fn test_process_checker() {
         let checker = ProcessChecker::new("");
-        assert!(checker.exec().await.unwrap());
+        assert!(checker.exec().await.unwrap().0);
     }
 }
