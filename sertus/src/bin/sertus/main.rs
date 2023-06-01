@@ -11,7 +11,7 @@ use sertus::{
     task::Task,
 };
 use tracing::{debug, info};
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::{fmt::time::LocalTime, layer::SubscriberExt, util::SubscriberInitExt};
 
 /// Sertus program
 #[derive(Parser, Debug)]
@@ -35,7 +35,7 @@ async fn main() -> Result<()> {
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()),
         )
-        .with(tracing_subscriber::fmt::layer())
+        .with(tracing_subscriber::fmt::layer().with_timer(LocalTime::rfc_3339()))
         .init();
 
     let cli = Cli::parse();
