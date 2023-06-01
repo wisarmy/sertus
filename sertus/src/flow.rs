@@ -26,6 +26,11 @@ impl Flow {
         self
     }
 
+    /// run flow
+    /// metrics gauge sertus_flow_task_status description:
+    /// 1.0 => success
+    /// 0.0 => faliure
+    /// -1.0 => error
     pub async fn run(self) {
         let flow_lables: Vec<(String, String)> = vec![("flow".to_owned(), self.name.clone())];
         loop {
@@ -48,21 +53,20 @@ impl Flow {
                         if status {
                             debug!("{:?}, stdout: {}", task.checker, output);
                             info!("Succeeded Task({})", task.name);
-                            metrics::increment_counter!("sertus_flow_task_succeed_count", &labels);
+                            metrics::gauge!("sertus_flow_task_status", 1.0, &labels);
                         } else {
                             warn!("{:?}, stderr: {}", task.checker, output);
                             warn!("Failed Task({})", task.name);
-                            metrics::increment_counter!("sertus_flow_task_fail_count", &labels);
+                            metrics::gauge!("sertus_flow_task_status", 0.0, &labels);
                         }
                     }
                     Err(e) => {
-                        metrics::increment_counter!("sertus_flow_task_error_count", &labels);
+                        metrics::gauge!("sertus_flow_task_status", -1.0, &labels);
                         error!("Error Task({}), {}", task.name, e);
                     }
                 }
             }
             debug!("Ended Flow({})", self.name);
-            metrics::increment_counter!("sertus_flow_loop_count", &flow_lables);
             sleep(Duration::from_secs(self.interval)).await
         }
     }
