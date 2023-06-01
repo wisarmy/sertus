@@ -4,7 +4,7 @@ use regex::Regex;
 use crate::error::Result;
 
 const LABEL_RE: Lazy<std::result::Result<Regex, regex::Error>> =
-    Lazy::new(|| Regex::new(r"\((\w+)\s*,\s*(\w+)\)"));
+    Lazy::new(|| Regex::new(r"\((\w+)\s*,\s*([^),]+)\)"));
 
 pub trait LabelExtractor {
     fn extract_label(&self) -> Result<Vec<(String, String)>>;
