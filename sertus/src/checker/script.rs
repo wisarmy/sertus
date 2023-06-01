@@ -9,11 +9,15 @@ use crate::executor::Executor;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ScriptChecker {
     path: String,
+    bin: Option<String>,
 }
 
 impl ScriptChecker {
     pub fn new(path: impl Into<String>) -> Self {
-        Self { path: path.into() }
+        Self {
+            path: path.into(),
+            bin: Some("bash".to_string()),
+        }
     }
 }
 
@@ -27,7 +31,7 @@ impl Display for ScriptChecker {
 impl Executor for ScriptChecker {
     type Output = (bool, String);
     async fn exec(&self) -> crate::error::Result<Self::Output> {
-        let output = Command::new("bash")
+        let output = Command::new(self.bin.clone().unwrap_or("bash".to_string()))
             .arg(self.path.clone())
             .output()
             .await

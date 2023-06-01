@@ -52,6 +52,11 @@ checker.ProcessChecker = { prefix = "process prefix" }
 [[flows.tasks]]
 name = "check script"
 checker.ScriptChecker = { path = "~/.sertus/scripts/script.sh" }
+
+# the bin is option, default "bash", if use python:
+[[flows.tasks]]
+name = "check py script"
+checker.ScriptChecker = { path = "~/.sertus/scripts/script.py" , bin = "python3"}
 ```
 # ScriptChecker & Metrics labels
 By default, Metrics has labels for flow and task. If you want to add custom labels in ScriptChecker, you should echo like `#label (k, v) (x, y)` in your script.
