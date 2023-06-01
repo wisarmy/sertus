@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use tokio::time::sleep;
 use tracing::{debug, error, info, warn};
 
-use crate::{executor::Executor, task::Task};
+use crate::{executor::Executor, label::LabelExtractor, task::Task};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Flow {
@@ -27,19 +27,30 @@ impl Flow {
     }
 
     pub async fn run(self) {
-        let flow_lables: Vec<(&str, String)> = vec![("flow", self.name.clone())];
+        let flow_lables: Vec<(String, String)> = vec![("flow".to_owned(), self.name.clone())];
         loop {
-            let mut labels: Vec<(&str, String)> = flow_lables.clone();
-            debug!("Starting Flow({} {})", self.name, "-".repeat(30));
+            debug!("Starting Flow({})", self.name);
             for task in self.tasks.clone() {
-                labels.push(("task", task.name.clone()));
+                let mut labels: Vec<(String, String)> = flow_lables.clone();
+                labels.push(("task".to_owned(), task.name.clone()));
                 debug!("Running Task({}), {:?}", task.name, task.checker);
                 match task.checker.exec().await {
-                    Ok(output) => {
-                        if output {
+                    Ok((status, output)) => {
+                        // extract label from output
+                        output
+                            .extract_label()
+                            .inspect_err(|e| error!("extract label: {}", e))
+                            .map(|items| {
+                                labels.extend(items);
+                            })
+                            .ok();
+                        debug!("metrics labels: {:?}", labels);
+                        if status {
+                            debug!("{:?}, stdout: {}", task.checker, output);
                             info!("Succeeded Task({})", task.name);
                             metrics::increment_counter!("sertus_flow_task_succeed_count", &labels);
                         } else {
+                            warn!("{:?}, stderr: {}", task.checker, output);
                             warn!("Failed Task({})", task.name);
                             metrics::increment_counter!("sertus_flow_task_fail_count", &labels);
                         }
@@ -50,7 +61,7 @@ impl Flow {
                     }
                 }
             }
-            debug!("Ended Flow({} {})", self.name, "-".repeat(30));
+            debug!("Ended Flow({})", self.name);
             metrics::increment_counter!("sertus_flow_loop_count", &flow_lables);
             sleep(Duration::from_secs(self.interval)).await
         }

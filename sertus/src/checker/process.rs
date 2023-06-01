@@ -3,7 +3,6 @@ use std::fmt::Display;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use tokio::process::Command;
-use tracing::{debug, warn};
 
 use crate::executor::Executor;
 
@@ -28,7 +27,7 @@ impl Display for ProcessChecker {
 
 #[async_trait]
 impl Executor for ProcessChecker {
-    type Output = bool;
+    type Output = (bool, String);
     async fn exec(&self) -> crate::error::Result<Self::Output> {
         let output = Command::new("ps")
             .arg("-eo")
@@ -43,15 +42,10 @@ impl Executor for ProcessChecker {
             .filter(|s| *s != "COMMAND")
             .filter(|s| s.starts_with(&self.prefix))
             .collect::<Vec<_>>();
-        debug!("process checker: {}, {:?}", self.prefix, processes);
         if output.stderr.len() > 0 {
-            warn!(
-                "process checker stderr: {}, {}",
-                self.prefix,
-                String::from_utf8_lossy(&output.stderr)
-            );
+            return Ok((false, String::from_utf8_lossy(&output.stderr).into_owned()));
         }
-        Ok(processes.len() > 0)
+        Ok((processes.len() > 0, processes.join("\n")))
     }
 }
 

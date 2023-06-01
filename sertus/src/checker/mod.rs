@@ -16,7 +16,7 @@ pub enum Checker {
 }
 #[async_trait::async_trait]
 impl Executor for Checker {
-    type Output = bool;
+    type Output = (bool, String);
     async fn exec(&self) -> Result<Self::Output> {
         match self {
             Checker::ProcessChecker(checker) => checker.exec().await,

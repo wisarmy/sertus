@@ -3,7 +3,6 @@ use std::fmt::Display;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use tokio::process::Command;
-use tracing::{debug, warn};
 
 use crate::executor::Executor;
 
@@ -26,7 +25,7 @@ impl Display for ScriptChecker {
 
 #[async_trait]
 impl Executor for ScriptChecker {
-    type Output = bool;
+    type Output = (bool, String);
     async fn exec(&self) -> crate::error::Result<Self::Output> {
         let output = Command::new("bash")
             .arg(self.path.clone())
@@ -34,15 +33,10 @@ impl Executor for ScriptChecker {
             .await
             .unwrap();
         let content = String::from_utf8_lossy(&output.stdout);
-        debug!("script checker stdout: {}, {}", self.path, content);
         if output.stderr.len() > 0 {
-            warn!(
-                "script checker stderr: {}, {}",
-                self.path,
-                String::from_utf8_lossy(&output.stderr)
-            );
+            return Ok((false, String::from_utf8_lossy(&output.stderr).into_owned()));
         }
-        Ok(output.status.success())
+        Ok((output.status.success(), content.to_string()))
     }
 }
 #[cfg(test)]

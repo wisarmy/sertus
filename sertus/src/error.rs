@@ -24,6 +24,8 @@ pub enum AppError {
     Reqwest(#[from] reqwest::Error),
     #[error("config error")]
     Config(#[from] sconfig::error::ConfigError),
+    #[error("regex error")]
+    Regex(#[from] regex::Error),
 }
 
 #[macro_export]

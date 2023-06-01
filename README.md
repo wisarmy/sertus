@@ -53,5 +53,19 @@ checker.ProcessChecker = { prefix = "process prefix" }
 name = "check script"
 checker.ScriptChecker = { path = "~/.sertus/scripts/script.sh" }
 ```
+# ScriptChecker & Metrics labels
+By default, Metrics has labels for flow and task. If you want to add custom labels in ScriptChecker, you should echo like `#label (k, v) (x, y)` in your script.
+Example:
+```bash
+#!/bin/bash
+
+# stdout 
+echo "#label (k, v) (x, y)"
+echo "ok msg"
+
+# or stderr
+echo "#label (k, v) (x, y)" >&2
+echo "err msg" >&2
+```
 
 
