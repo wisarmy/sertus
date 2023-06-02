@@ -1,5 +1,5 @@
 # Sertus
-Sertus is a service status monitoring tool that supports multiple checkers, including processes, scripts, APIs, and more.
+Sertus is a service status monitoring tool written in rust that supports multiple checkers, including processes, scripts, APIs, and more.
 
 # Features
 - [x] Supports Prometheus metrics
