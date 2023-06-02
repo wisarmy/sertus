@@ -71,6 +71,16 @@ echo "ok msg"
 # or stderr
 echo "#label (k, v) (x, y)" >&2
 echo "err msg" >&2
+exit 1
 ```
+:warning: ScriptChecker fails in any of the following cases:
+- has stderr
+- exit code != 0
+
+# Metrics 
+`sertus_flow_task_status` gauge:
+- `1.0` task succeed
+- `0.0` task failed
+- `-1.0` task checker happened unknown error, please check the sertus log
 
 
