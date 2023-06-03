@@ -8,7 +8,7 @@ use crate::executor::Executor;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ProcessChecker {
-    prefix: String,
+    pub prefix: String,
 }
 
 impl ProcessChecker {

@@ -29,6 +29,15 @@ pub struct Server {
     pub bucket: String,
 }
 
+impl Default for Server {
+    fn default() -> Self {
+        Server {
+            addr: "127.0.0.1:9296".to_string(),
+            bucket: "sertus".to_string(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PushGateway {
     /// http://127.0.0.1:9091/metrics/job/example/instance/127.0.0.1
@@ -37,6 +46,16 @@ pub struct PushGateway {
     pub interval: Option<u64>,
     /// Duration of metrics record retention, default 60s
     pub idle_timeout: Option<u64>,
+}
+
+impl Default for PushGateway {
+    fn default() -> Self {
+        PushGateway {
+            endpoint: "http://127.0.0.1:9091/metrics/job/sertus/instance/127.0.0.1".to_string(),
+            interval: Some(10),
+            idle_timeout: Some(60),
+        }
+    }
 }
 
 pub async fn start_metrics_server(config: Server) {

@@ -1,17 +1,16 @@
+#![feature(result_option_inspect)]
 use clap::{Parser, Subcommand};
-use sconfig::Configurable;
 use sertus::{
-    checker::Checker,
-    checker::{process::ProcessChecker, script::ScriptChecker},
-    config::{with_config, Config},
+    config::with_config,
     error::Result,
-    flow::Flow,
     metrics::{setup_pushgateway, start_metrics_server, Metrics},
     pkg::version,
-    task::Task,
 };
 use tracing::{debug, info};
 use tracing_subscriber::{fmt::time::LocalTime, layer::SubscriberExt, util::SubscriberInitExt};
+
+pub mod config;
+pub mod init;
 
 /// Sertus program
 #[derive(Parser, Debug)]
@@ -25,10 +24,20 @@ struct Cli {
 enum Command {
     Init {
         #[clap(short, long)]
+        interact: bool,
+        #[clap(short, long)]
         force: bool,
     },
     Daemon,
+    #[clap(subcommand)]
+    Config(ConfigCommand),
 }
+
+#[derive(Subcommand, Debug)]
+enum ConfigCommand {
+    Edit,
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     tracing_subscriber::registry()
@@ -40,23 +49,10 @@ async fn main() -> Result<()> {
 
     let cli = Cli::parse();
     match cli.commnad {
-        Command::Init { force } => {
-            // init
-            let mut config = Config::default();
-            let mut flow1 = Flow::new("flow 1");
-            flow1
-                .add_task(Task::new(
-                    "check process",
-                    Checker::ProcessChecker(ProcessChecker::new("process prefix")),
-                ))
-                .add_task(Task::new(
-                    "check script",
-                    Checker::ScriptChecker(ScriptChecker::new("~/.sertus/scripts/script.sh")),
-                ));
-            config.add_flow(flow1);
-
-            config.init(force)?;
-        }
+        Command::Init { interact, force } => match interact {
+            true => init::interact(force)?,
+            false => init::default(force)?,
+        },
         Command::Daemon => {
             info!("Initializing daemon");
             with_config(|c| async move {
@@ -77,6 +73,11 @@ async fn main() -> Result<()> {
             .await;
             std::future::pending::<()>().await;
         }
+        Command::Config(config_command) => match config_command {
+            ConfigCommand::Edit => {
+                config::editor().await;
+            }
+        },
     }
 
     Ok(())

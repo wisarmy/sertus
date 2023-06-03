@@ -8,8 +8,8 @@ use crate::executor::Executor;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ScriptChecker {
-    path: String,
-    bin: Option<String>,
+    pub path: String,
+    pub bin: Option<String>,
 }
 
 impl ScriptChecker {
