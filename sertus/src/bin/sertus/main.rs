@@ -22,19 +22,25 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Command {
+    /// Initialize config
     Init {
+        /// interactively create config
         #[clap(short, long)]
         interact: bool,
+        /// force overwrite of existing config
         #[clap(short, long)]
         force: bool,
     },
+    /// Run daemon
     Daemon,
+    /// Config subcommands
     #[clap(subcommand)]
     Config(ConfigCommand),
 }
 
 #[derive(Subcommand, Debug)]
 enum ConfigCommand {
+    /// Edit config
     Edit,
 }
 

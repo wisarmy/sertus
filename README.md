@@ -17,6 +17,8 @@ To get started with Sertus, follow these simple steps:
 1. Initialize the Sertus configuration by running the following command:
 ```shell
 sertus init
+// or interactively create config
+sertus init -i
 ```
 The default configuration file `~/.sertus/config.toml` will be generated.
 
