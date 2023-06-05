@@ -49,13 +49,13 @@ mod tests {
 
     use tempfile::NamedTempFile;
 
-    use crate::{executor::Executor, init_tracing_log};
+    use crate::{executor::Executor, pkg::log::init_tracing};
 
     use super::ScriptChecker;
 
     #[tokio::test]
     async fn test_script_checker() -> Result<(), Box<dyn std::error::Error>> {
-        init_tracing_log();
+        init_tracing();
         let mut script_file = NamedTempFile::new()?;
         // write a script into a temporary
         let script_content = "#!/bin/bash\necho \"Hello, world!\"\n";

@@ -4,10 +4,9 @@ use sertus::{
     config::with_config,
     error::Result,
     metrics::{setup_pushgateway, start_metrics_server, Metrics},
-    pkg::version,
+    pkg::{log::init_tracing, version},
 };
 use tracing::{debug, info};
-use tracing_subscriber::{fmt::time::LocalTime, layer::SubscriberExt, util::SubscriberInitExt};
 
 pub mod config;
 pub mod init;
@@ -46,13 +45,7 @@ enum ConfigCommand {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    tracing_subscriber::registry()
-        .with(
-            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()),
-        )
-        .with(tracing_subscriber::fmt::layer().with_timer(LocalTime::rfc_3339()))
-        .init();
-
+    init_tracing();
     let cli = Cli::parse();
     match cli.commnad {
         Command::Init { interact, force } => match interact {
