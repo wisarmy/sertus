@@ -35,7 +35,6 @@ sertus daemon
 # use metrics server
 [metrics.Server]
 addr = "127.0.0.1:9296"
-bucket = "sertus"
 
 # or use prometheus push gateway
 #[metrics.PushGateway]

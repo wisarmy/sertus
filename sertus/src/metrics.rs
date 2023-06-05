@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use tracing::info;
 
 const METRICS_ROUTE_PATH: &str = "/metrics";
+const METRICS_BUCKET: &str = "sertus";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Metrics {
@@ -16,24 +17,21 @@ pub enum Metrics {
 
 impl Default for Metrics {
     fn default() -> Self {
-        Metrics::Server(Server {
-            addr: "127.0.0.1:9296".to_string(),
-            bucket: "sertus".to_string(),
-        })
+        Metrics::Server(Server::default())
     }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Server {
     pub addr: String,
-    pub bucket: String,
+    pub bucket: Option<String>,
 }
 
 impl Default for Server {
     fn default() -> Self {
         Server {
             addr: "127.0.0.1:9296".to_string(),
-            bucket: "sertus".to_string(),
+            bucket: None,
         }
     }
 }
@@ -59,7 +57,7 @@ impl Default for PushGateway {
 }
 
 pub async fn start_metrics_server(config: Server) {
-    let app = metrics_app(config.bucket);
+    let app = metrics_app(config.bucket.unwrap_or(METRICS_BUCKET.to_string()));
     let addr = config.addr.parse::<SocketAddr>().unwrap();
     info!("Metrics listening on {}", addr);
     info!("Metrics API: http://{}{}", addr, METRICS_ROUTE_PATH);
