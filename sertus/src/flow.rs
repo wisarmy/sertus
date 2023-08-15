@@ -4,7 +4,11 @@ use serde::{Deserialize, Serialize};
 use tokio::time::sleep;
 use tracing::{debug, error, info, warn};
 
-use crate::{executor::Executor, label::LabelExtractor, task::Task};
+use crate::{
+    executor::Executor,
+    metric_ext::{LabelExtractor, MetricExtractor},
+    task::Task,
+};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Flow {
@@ -42,12 +46,17 @@ impl Flow {
                 match task.checker.exec().await {
                     Ok((status, output)) => {
                         // extract label from output
+                        labels.extend(
+                            output
+                                .extract_label()
+                                .inspect_err(|e| error!("extract label: {}", e))
+                                .unwrap_or_default(),
+                        );
+                        // extract metric from output
                         output
-                            .extract_label()
-                            .inspect_err(|e| error!("extract label: {}", e))
-                            .map(|items| {
-                                labels.extend(items);
-                            })
+                            .extract_metric()
+                            .inspect_err(|e| error!("extract metric: {}", e))
+                            .map(|items| items.into_iter().for_each(|item| item.send()))
                             .ok();
                         debug!("metrics labels: {:?}", labels);
                         if status {

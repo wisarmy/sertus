@@ -1,5 +1,5 @@
 # Sertus
-Sertus is a service status monitoring tool written in rust that supports multiple checkers, including processes, scripts, APIs, and more.
+Sertus is a service status monitoring tool written in rust that supports multiple checkers, including processes, scripts with metrics, APIs, and more.
 
 # Features
 - [x] Supports Prometheus metrics
@@ -9,6 +9,7 @@ Sertus is a service status monitoring tool written in rust that supports multipl
 - [x] Allows for setting intervals for flows
 - [ ] Divides flows configuration into multiple flow config files
 - [x] Supports script checkers
+    - [x] Supports custom metrics
 - [ ] Supports API checkers
 
 # Get Started
@@ -60,19 +61,28 @@ name = "check py script"
 checker.ScriptChecker = { path = "~/.sertus/scripts/script.py" , bin = "python3"}
 ```
 # ScriptChecker & Metrics labels
-By default, Metrics has labels for flow and task. If you want to add custom labels in ScriptChecker, you should echo like `#label (k, v) (x, y)` in your script.
+By default, Metrics has labels for flow and task. If you want to add custom labels in ScriptChecker, you should echo like `#label {k=v, x=y}` in your script.
 Example:
 ```bash
 #!/bin/bash
 
 # stdout 
-echo "#label (k, v) (x, y)"
+echo "#label {k=v, x=y}"
 echo "ok msg"
 
 # or stderr
-echo "#label (k, v) (x, y)" >&2
+echo "#label {k=v, x=y}" >&2
 echo "err msg" >&2
 exit 1
+```
+# ScriptChecker & Custom Metrics
+If you want to add custom metrics in ScriptChecker, you should echo like `#metric key type {k=v, x=y} value` in your script. In addition, the key will be prefixed with `sertus_`.
+Example:
+```bash
+#!/bin/bash
+# the real key is sertus_key_xxx 
+echo "#metric key_xxx gauge {k=v, x=y} 1.0"
+echo "#metric key_xxx counter {k=v, x=y} 1"
 ```
 :warning: ScriptChecker fails in any of the following cases:
 - has stderr
